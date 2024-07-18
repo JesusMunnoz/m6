@@ -103,3 +103,5 @@ async function insertarDocumentos() {
 }
 
 insertarDocumentos().then(() => mongoose.disconnect());
+
+module.exports = { Teacher, Subject, Student, Marks }
