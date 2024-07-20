@@ -1,8 +1,7 @@
 const mongoose = require ("mongoose");
 mongoose.set('strictQuery', true);
 
-mongoose.connect('mongodb://localhost:27017/codenotchT2', 
-    {useNewUrlParser: false, useUnifiedTopology: false }  ) 
+mongoose.connect('mongodb://localhost:27017/codenotchT2') 
 
 let PhotosSchema = new mongoose.Schema({
     nombreUsuario: String,
