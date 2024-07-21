@@ -1,89 +1,157 @@
-const mongoose = require("mongoose");
-const { PhotoModel } = require("./photoMDB");
+const mongoose = require('mongoose');
+const Marks = require('./t3MDB');
 
-mongoose.connect('mongodb://localhost:27017/codenotchT2', 
+mongoose.connect('mongodb://localhost:27017/t3', 
     { useNewUrlParser: true, useUnifiedTopology: true }
-)
+);
 
-// Subida de fotos
-let data = {
-    nombreUsuario: "Pepe", 
-    url: "https://www.deere.es/assets/images/region-2/our-company/news/press-releases/es/Tractor_autonomo.jpg", 
-    titulo: "Campos verdes", 
-    comentario: "Parece un montón de cesped bien cortado."
-};
+// nota media asignatura
 
-let document = new PhotoModel(data); 
+async function mediaAsignatura(subject_name) {
+    try {
+        const result = await Marks.aggregate([
+            { $match: { subject_name: subject_name } },
+            { $group: {
+                _id: '$subject_name',
+                averageMark: { $avg: '$mark' }
+            }}
+        ]);
 
-document.save()
-.then(function(res){
-    console.log("Documento guardado correctamente desde promesa"); 
-    console.log(res) 
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("Error al escribir el documento")
-})
+        if (result.length > 0) {
+            console.log(`nota media en --  ${subject_name} -- ${result[0].averageMark}`);
+        } else {
+            console.log(`no hay notas en -- ${subject_name}`);
+        }
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
 
-PhotoModel.create(data)
-.then(function(res){
-    console.log("Documento guardado correctamente")
-    console.log(res)
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("Error al escribir el documento")
-})
+mediaAsignatura('Matemáticas');
+//mediaAsignatura('Física');
+//mediaAsignatura('Lengua');
 
+// numero alumnos en bootcamp
 
-// Dado un usuario obtener todas sus fotos.
-/*
-PhotoModel.find({"nombreUsuario":"Pepe"})
-.then (function(items){
-    console.log(items);
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("error")
-})
-*/
+async function totalAlumnos() {
+    try {
+        const totalStudents = await Marks.aggregate([
+            { $count: "totalStudents" }
+        ]);
+        console.log(`numero de alumnos -- ${totalStudents[0].totalStudents}`);
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
 
-// dado titulo y descripcion, modificar descripcion 
+//totalAlumnos();
 
-/*
-PhotoModel.updateOne({"titulo": "Vehículo"}, {"comentario": "en verdes praderas me hace reposar"})
-.then(function(item){
-    console.log(item);
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("error")
-})
-*/
+// nombre y apellidos de alumnos
 
-//dado usuario y titulo eliminar foto
-/*
-PhotoModel.deleteOne({"$and": [{"nombreUsuario": "Pedro"}, {"titulo": "Formas geométricas"}]})
-.then(function(item){
-    console.log("borrado correctamente");
-    console.log(item);
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("error")
-})
-*/
+async function nom_Ape_Stdts() {
+    try {
+        const students = await Marks.aggregate([
+            { $project: { student_first_name: 1, student_last_name: 1 } }
+        ]);
+        console.log('-- alumnos de bootcamp --');
+        students.forEach(student => {
+            console.log(`${student.student_first_name} ${student.student_last_name}`);
+        });
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
 
-// dado usuario eliminar todas sus fotos
+//nom_Ape_Stdts();
 
-/*
-PhotoModel.deleteMany({"nombreUsuario": "Pepe"})
-.then(function(item){
-    console.log("borrado correctamente");
-    console.log(item);
-    mongoose.disconnect();
-})
-.catch(function(){
-    console.log("error")
-})
-*/
+// nombre y apellidos de profes
+
+async function profes() {
+    try {
+        const teachers = await Marks.aggregate([
+            { $unwind: '$teachers' },
+            { $project: { 'teachers.teacher_first_name': 1, 'teachers.teacher_last_name': 1 } }
+        ]);
+        console.log('-- profesores de bootcamp --');
+        teachers.forEach(teacher => {
+            console.log(`${teacher.teachers.teacher_first_name} ${teacher.teachers.teacher_last_name}`);
+        });
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
+
+//profes();
+
+// numero de alumnos por grupo en orden inverso
+
+async function stdtsByGrup() {
+    try {
+        const result = await Marks.aggregate([
+            { $group: { _id: '$group_name', totalStudents: { $sum: 1 } } },
+            { $sort: { _id: -1 } }
+        ]);
+
+        result.forEach(group => {
+            console.log(`Grupo ${group._id}: ${group.totalStudents} estudiantes`);
+        });
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
+
+//stdtsByGrup();
+
+// top5 de los nombres de las asignaturas cuya nota media sea mayor que 5
+
+async function top5() {
+    try {
+        const result = await Marks.aggregate([
+            { $group: { _id: '$subject_name', averageMark: { $avg: '$mark' } } },
+            { $match: { averageMark: { $gt: 5 } } },
+            //{ $sort: { averageMark: -1 } },
+            { $limit: 5 }
+        ]);
+
+        console.log('esto es top 5');
+        result.forEach(subject => {
+            console.log(`${subject._id} -- nota media ${subject.averageMark}`);
+        });
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
+
+//top5();
+
+//numero de profesores por asignatura
+
+async function profesPor() {
+    try {
+        const result = await Marks.aggregate([
+            { 
+                $group: {
+                    _id: '$subject_name',
+                    totalTeachers: { $sum: { $size: '$teachers' } }
+                }
+            }
+        ]);
+
+        console.log('profes por asignatura');
+        result.forEach(subject => {
+            console.log(`Asignatura ${subject._id}: ${subject.totalTeachers} profesores`);
+        });
+    } catch (error) {
+        console.error(error);
+        mongoose.disconnect();
+    } 
+}
+
+//profesPor();
+
