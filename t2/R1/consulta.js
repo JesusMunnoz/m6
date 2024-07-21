@@ -1,15 +1,13 @@
 const mongoose = require("mongoose");
 const { PhotoModel } = require("./photoMDB");
 
-mongoose.connect('mongodb://localhost:27017/codenotchT2', 
-    { useNewUrlParser: true, useUnifiedTopology: true }
-)
+mongoose.connect('mongodb://localhost:27017/codenotchT2')
 
 async function guardar(data) {
     try {
         let document = new PhotoModel(data);
         let res = await document.save();
-        console.log("Documento guardado correctamente");
+        console.log("Documento guardado");
         console.log(res);
     } catch (error) {
         console.log("Error al escribir el documento");
@@ -25,7 +23,7 @@ async function damePhotos(nombreUsuario) {
         console.log(items);
         mongoose.disconnect();
     } catch (error) {
-        console.log("Error al obtener las fotos");
+        console.log("error al obtener las fotos");
         console.log(error);
         mongoose.disconnect();
     }
@@ -38,7 +36,7 @@ async function actualizarComent(titulo, comentario) {
         console.log(item);
         mongoose.disconnect();
     } catch (error) {
-        console.log("Error de actualización");
+        console.log("error de actualización");
         console.log(error);
         mongoose.disconnect();
     }
@@ -48,11 +46,11 @@ async function actualizarComent(titulo, comentario) {
 async function borrarUna(nombreUsuario, titulo) {
     try {
         let item = await PhotoModel.deleteOne({ "$and": [{ "nombreUsuario": nombreUsuario }, { "titulo": titulo }] });
-        console.log("Se borró la foto");
+        console.log("se borró la foto");
         console.log(item);
         mongoose.disconnect();
     } catch (error) {
-        console.log("Error al eliminar la foto");
+        console.log("Error al eliminar foto");
         console.log(error);
         mongoose.disconnect();
     }
@@ -62,11 +60,11 @@ async function borrarUna(nombreUsuario, titulo) {
 async function borrarTodas(nombreUsuario) {
     try {
         let item = await PhotoModel.deleteMany({ "nombreUsuario": nombreUsuario });
-        console.log("Se borraron todas las fotos");
+        console.log("se borraron todas las fotos");
         console.log(item);
         mongoose.disconnect();
     } catch (error) {
-        console.log("Error al eliminar todas las fotos");
+        console.log("Error al eliminar fotos");
         console.log(error);
         mongoose.disconnect();
     }
