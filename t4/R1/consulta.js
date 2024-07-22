@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { PhotoModel } = require("./photoMDB");
 
-mongoose.connect('mongodb://localhost:27017/codenotchT2')
+mongoose.connect('mongodb://localhost:27017/codenotchT4')
 
 async function guardar(data) {
     try {

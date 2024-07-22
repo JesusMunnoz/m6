@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const {Schema, model} = require("mongoose");
 
 const PhotosSchema = new Schema(
     {
@@ -10,4 +10,13 @@ const PhotosSchema = new Schema(
     }
 )
 
-module.exports = mongoose = { "Photo", PhotosSchema, "photo" };
+module.exports = model("Photos", PhotosSchema, "photos");
+
+/*
+{
+    "nombreUsuario": "Peponazo",
+    "url": "https://www.deere.es/assets/images/region-2/our-company/news/press-releases/es/Tractor_autonomo.jpg",
+    "titulo": "Tractor Amarillo es lo que se lleva ahora",
+    "comentario": "dfgdgdfgd"
+}
+*/

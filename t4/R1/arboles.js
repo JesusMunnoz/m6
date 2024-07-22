@@ -1,16 +1,8 @@
 const mongoose = require ("mongoose");
 mongoose.set('strictQuery', true);
+const PhotoModel = require("./photoMDB"); 
 
-mongoose.connect('mongodb://localhost:27017/codenotchT2') 
-
-let PhotosSchema = new mongoose.Schema({
-    nombreUsuario: String,
-    url: String,
-    titulo: String,
-    comentario: String
-});
-
-const PhotoModel = mongoose.model("PhotoModel", PhotosSchema);
+mongoose.connect('mongodb://localhost:27017/codenotchT4') 
 
 let photo1 = new PhotoModel(
     {
@@ -19,7 +11,7 @@ let photo1 = new PhotoModel(
         titulo: "Tractor", 
         comentario: "Tractor verde arando tierras secas."
     }
-)
+);
 
 let photo2 = new PhotoModel(
     {

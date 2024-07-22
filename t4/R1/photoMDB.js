@@ -7,6 +7,6 @@ let PhotosSchema = new mongoose.Schema({
     comentario: String
 });
 
-const PhotoModel = mongoose.model("PhotoModel", PhotosSchema);
+const PhotoModel = mongoose.model("Photo", PhotosSchema);
 
-module.exports = mongoose.model = { PhotoModel };
+module.exports = PhotoModel;
